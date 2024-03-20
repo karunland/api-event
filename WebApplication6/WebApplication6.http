@@ -8,19 +8,19 @@ POST http://localhost:5000/todos
 Content-Type: application/json
 
 {
-  "id": 3,
+  "id": 0,
   "title": "Learn dotnetcore",
-  "date": "2024-01-01"
+  "date": "2025-12-30"
 }
 
 ###
-GET http://localhost:5000/todos/3
+// get detail service
+GET http://localhost:5000/modos/1
 
 
 ###
-
-DELETE http://localhost:5000/todos/3
-
+// delete service
+DELETE http://localhost:5000/modos/1
 
 
 ###

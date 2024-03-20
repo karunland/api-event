@@ -1,38 +1,74 @@
+using Microsoft.AspNetCore.Rewrite;
+using Microsoft.EntityFrameworkCore;
+using WebApplication6;
+using WebApplication6.Model;
+
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddScoped<ITodoService, TodoService>();
+
+builder.Services.AddDbContext<TodoDbContext>(options =>
+{
+    options.UseSqlite("Data Source=TodoDb.db");
+});
+
 
 var app = builder.Build();
 
-var myTodos = new List<Todo>();
+app.UseRewriter(new RewriteOptions().AddRedirect("modos/(.*)", "todos/$1"));
 
-app.MapGet("/", () => "hello world");
-
-app.MapGet("/todos", () => myTodos);
-
-app.MapPost("/todos", (Todo todo) =>
+app.Use(async (context, next) =>
 {
-    myTodos.Add(todo);
-    return Results.Created($"/todos/{todo.Id}", todo);
+    Console.WriteLine($"Request: {context.Request.Path} {DateTime.Now}");
+    await next();
+    Console.WriteLine($"Response: {context.Response.StatusCode} {DateTime.Now}");
 });
 
-app.MapGet("/todos/{id}", (int id) => myTodos.SingleOrDefault(x => x.Id == id));
+var myTodos = new List<Todo>();
 
-app.MapDelete("/todos/{id:int}", (int id) =>
+app.MapGet("/todos", (ITodoService todoService) =>
 {
-    var obj = myTodos.SingleOrDefault(x => x.Id == id);
-    if (obj == null)
+    return todoService.GetTodos();
+});
+
+app.MapPost("/todos", (Todo todo, ITodoService todoService) =>
+{
+    var model = todoService.AddTodo(todo);
+    return Results.Ok(model);
+}).AddEndpointFilter(async (context, next) =>
+{
+    var taskArgument = context.GetArgument<Todo>(0);
+    var errors = new Dictionary<string, string[]>();
+
+    if (taskArgument.Date < DateTime.Now)
+        errors.Add("Date", ["The Date field must be a date in the future."]);
+
+    if (errors.Count > 0)
+        return Results.ValidationProblem(errors); // 400
+    return await next(context);
+});
+
+// detail service
+app.MapGet("/todos/{id}", (int id, ITodoService todoService) =>
+{
+    var detail = todoService.GetTodoById(id);
+    if (detail == null)
     {
         return Results.NotFound("obje bulunamadi");
     }
-    myTodos.Remove(obj);
-    return Results.Ok("obje silindi");
+    return Results.Ok(detail);
+});
+
+// delete service
+app.MapDelete("/todos/{id:int}", (int id, ITodoService todoService) =>
+{
+    var model = todoService.GetTodoById(id);
+    if (model == null)
+    {
+        return Results.NotFound("obje bulunamadi");
+    }
+    todoService.DeleteTodoById(id);
+    return Results.NoContent();
 });
 
 app.Run();
 
-
-public class Todo
-{
-    public int Id { get; set; }
-    public string Title { get; set; } = null!;
-    public DateTime Date { get; set; }
-}
