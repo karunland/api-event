@@ -6,12 +6,6 @@ using WebApplication6.Model;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<ITodoService, TodoService>();
 
-builder.Services.AddDbContext<TodoDbContext>(options =>
-{
-    options.UseSqlite("Data Source=TodoDb.db");
-});
-
-
 var app = builder.Build();
 
 app.UseRewriter(new RewriteOptions().AddRedirect("modos/(.*)", "todos/$1"));

@@ -12,38 +12,37 @@ namespace WebApplication6
 
     public class TodoService : ITodoService
     {
-        private readonly TodoDbContext _context;
-        public TodoService(TodoDbContext context)
+        private List<Todo> _todos = new List<Todo>
         {
-            _context = context;
-        }
+            new Todo { Id = 1, Date = DateTime.Now, Title = "Todo 1", Description = "Description 1" },
+            new Todo { Id = 2, Date = DateTime.Now, Title = "Todo 2", Description = "Description 2" },
+            new Todo { Id = 3, Date = DateTime.Now, Title = "Todo 3", Description = "Description 3" },
+        };
 
-        public Todo? GetTodoById(int id)
+        public Todo AddTodo(Todo todo)
         {
-            return _context.Todos.SingleOrDefault(x => x.Id == id);
-        }
-
-        public List<Todo> GetTodos()
-        {
-            return _context.Todos.ToList();
+            todo.Id = _todos.Max(t => t.Id) + 1;
+            _todos.Add(todo);
+            return todo;
         }
 
         public void DeleteTodoById(int id)
         {
-            var obj = _context.Todos.SingleOrDefault(x => x.Id == id);
-            if (obj == null)
+            var todo = _todos.FirstOrDefault(t => t.Id == id);
+            if (todo != null)
             {
-                return;
+                _todos.Remove(todo);
             }
-            _context.Todos.Remove(obj);
-            _context.SaveChanges();
         }
 
-        public Todo AddTodo(Todo todo)
+        public Todo? GetTodoById(int id)
         {
-            _context.Todos.Add(todo);
-            _context.SaveChanges();
-            return todo;
+            return _todos.FirstOrDefault(t => t.Id == id);
+        }
+
+        public List<Todo> GetTodos()
+        {
+            return _todos;
         }
     }
 }
