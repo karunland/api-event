@@ -1,5 +1,5 @@
 
-GET https://api.karunlander.net/todos
+GET http://localhost:5000/todos
 
 ###
 POST https://api.karunlander.net/todos
@@ -19,6 +19,35 @@ GET https://api.karunlander.net/modos/1
 ###
 // delete service
 DELETE https://api.karunlander.net/modos/3
+
+
+###
+
+Get https://localhost:7127/todos
+###
+
+
+
+GET http://localhost:5000/todos
+
+###
+POST http://localhost:5000/todos
+Content-Type: application/json
+
+{
+  "id": 0,
+  "title": "Learn dotnetcore",
+  "date": "2025-12-30"
+}
+
+###
+// get detail service
+GET http://localhost:5000/modos/1
+
+
+###
+// delete service
+DELETE http://localhost:5000/modos/3
 
 
 ###
