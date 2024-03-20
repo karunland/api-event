@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Rewrite;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using WebApplication6;
-using WebApplication6.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<ITodoService, TodoService>();

@@ -27,7 +27,7 @@ public static class TodoItemsEndpoints
             if (errors.Count > 0)
                 return Results.ValidationProblem(errors); // 400
             return await next(context);
-        });
+        }).Produces<Todo>();
 
         // detail service
         app.MapGet("/todos/{id}", (int id, ITodoService todoService) =>
